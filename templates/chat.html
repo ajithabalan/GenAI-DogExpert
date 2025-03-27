@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dog Breed Chatbot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      h2 {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 15px;
+        color: #4a4a4a;
+      }
+
+      form {
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+
+      input[type="text"] {
+        flex-grow: 1;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: 0.3s ease;
+      }
+
+      input[type="text"]:focus {
+        border-color: #4caf50;
+        box-shadow: 0px 0px 10px rgba(76, 175, 80, 0.5);
+      }
+
+      button {
+        padding: 12px 18px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .response-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin-top: 20px;
+        width: 90%;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .breed {
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+      }
+      .user-query {
+        font-weight: bold;
+        color: #4a4a4a;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #555;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      .toggle-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .toggle-container label {
+        font-size: 14px;
+        margin-right: 8px;
+      }
+
+      .toggle-switch {
+        width: 40px;
+        height: 20px;
+        background: #ddd;
+        border-radius: 20px;
+        position: relative;
+        transition: 0.3s;
+      }
+
+      .toggle-switch::before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: white;
+        border-radius: 50%;
+        top: 1px;
+        left: 2px;
+        transition: 0.3s;
+      }
+
+      .dark-mode .toggle-switch {
+        background: #4caf50;
+      }
+
+      .dark-mode .toggle-switch::before {
+        left: 20px;
+      }
+
+      .dark-mode {
+        background-color: #1e1e1e;
+        color: #f0f0f0;
+      }
+
+      .dark-mode .response-container {
+        background-color: #333;
+        color: #f0f0f0;
+      }
+
+      .dark-mode input[type="text"] {
+        background-color: #444;
+        color: white;
+        border: 1px solid #777;
+      }
+
+      .dark-mode button {
+        background-color: #45a049;
+      }
+
+      .dark-mode .breed {
+        color: #fff;
+      }
+
+      .dark-mode .description {
+        color: #bbb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toggle-container">
+      <label for="darkModeToggle">Dark Mode</label>
+      <div class="toggle-switch" id="darkModeToggle"></div>
+    </div>
+
+    <h2>Ask AI About Dog Breeds</h2>
+
+    <form action="/chat" method="post">
+      <input
+        type="text"
+        name="query"
+        placeholder="Which breed is best for families?"
+        required
+      />
+      <button type="submit">Ask AI</button>
+    </form>
+    {% if response %}
+    <div class="response-container">
+      {% if query %}
+
+      <p class="user-query">{{ query }}</p>
+
+      {% endif %}
+      <h3>AI Answer:</h3>
+
+      {% if response is iterable and response[0] is mapping %} {% for breed in
+      response %}
+      <p class="breed">{{ breed["breed"] }}</p>
+      <p class="description">{{ breed["description"] }}</p>
+      {% endfor %} {% else %}
+      <p id="ai-response">{{ response }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <script>
+      document
+        .getElementById("darkModeToggle")
+        .addEventListener("click", function () {
+          document.body.classList.toggle("dark-mode");
+        });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        let breedNames = [
+          "Chihuahua",
+          "Shih-Tzu",
+          "Toy Terrier",
+          "Italian Greyhound",
+          "American Staffordshire Terrier",
+          "Bedlington Terrier",
+          "Border Terrier",
+          "Standard Schnauzer",
+          "Tibetan Terrier",
+          "Silky Terrier",
+          "Flat-Coated Retriever",
+          "Curly-Coated Retriever",
+          "Golden Retriever",
+          "Labrador Retriever",
+          "Chesapeake Bay Retriever",
+          "Collie",
+          "Rottweiler",
+          "German Shepherd",
+          "Doberman",
+          "Boxer",
+          "Bull Mastiff",
+          "Tibetan Mastiff",
+          "French Bulldog",
+          "Great Dane",
+          "Saint Bernard",
+          "Siberian Husky",
+          "Pug",
+          "Pomeranian",
+          "Toy Poodle",
+          "Miniature Poodle",
+          "Standard Poodle",
+        ];
+
+        let responseElement = document.getElementById("ai-response");
+        if (responseElement) {
+          let responseText = responseElement.innerHTML;
+          responseText = responseText.replace(/[*-]/g, "");
+
+          breedNames.forEach((breed) => {
+            let singular = new RegExp(`\\b${breed}\\b`, "gi");
+            let plural = new RegExp(`\\b${breed}s\\b`, "gi");
+
+            responseText = responseText.replace(
+              singular,
+              `<strong>${breed}</strong>`
+            );
+            responseText = responseText.replace(
+              plural,
+              `<strong>${breed}s</strong>`
+            );
+          });
+
+          responseElement.innerHTML = responseText;
+        }
+      });
+    </script>
+  </body>
+</html>
